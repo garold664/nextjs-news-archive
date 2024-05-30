@@ -72,7 +72,7 @@ function initDb() {
 
 const app = express();
 
-app.use(cors())
+app.use(cors());
 
 app.get('/news', (req, res) => {
   const news = db.prepare('SELECT * FROM news').all();
