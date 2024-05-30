@@ -4,8 +4,9 @@ import { DUMMY_NEWS, NewsItem } from '@/dummy-news';
 
 const db = sql('data.db');
 
-export function getAllNews() {
+export async function getAllNews() {
   const news = db.prepare('SELECT * FROM news').all() as NewsItem[];
+  await new Promise((res) => setTimeout(res, 3000));
   return news;
 }
 
