@@ -9,7 +9,7 @@ import { NewsItem } from '@/lib/types';
 import Link from 'next/link';
 import React from 'react';
 
-export default async function YearPage({
+export default async function FilteredNewsPage({
   params,
 }: {
   params: { filter: string[] | undefined };
@@ -17,7 +17,6 @@ export default async function YearPage({
   const filter = params.filter;
   const selectedYear = filter?.[0];
   const selectedMonth = filter?.[1];
-  // console.log(selectedMonth);
 
   let news: NewsItem[];
 
@@ -31,19 +30,19 @@ export default async function YearPage({
 
   if (selectedYear && selectedMonth) {
     news = await getNewsForYearAndMonth(selectedYear, selectedMonth);
-    // links = getAvailableNewsMonths(selectedYear);
     links = [];
-    // console.log(news);
   }
 
   if (news && news.length > 0) {
     newsContent = <NewsList news={news} />;
   }
 
+  const availableNewsYears = await getAvailableNewsYears();
+
   if (
-    (selectedYear && !getAvailableNewsYears().includes(+selectedYear)) ||
+    (selectedYear && !availableNewsYears.includes(selectedYear)) ||
     (selectedMonth &&
-      !getAvailableNewsMonths(selectedYear).includes(+selectedMonth))
+      !getAvailableNewsMonths(selectedYear).includes(selectedMonth))
   ) {
     throw new Error('Invalid filter');
   }

@@ -29,23 +29,25 @@ export async function getAvailableNewsYears() {
   const years = db
     .prepare("SELECT DISTINCT strftime('%Y', date) as year FROM news")
     .all()
-    .map((year) => year.year);
+    .map((year: { year: string }) => {
+      return year.year;
+    });
 
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
   return years as string[];
 }
 
-export function getAvailableNewsMonths(year) {
+export function getAvailableNewsMonths(year: string): string[] {
   return db
     .prepare(
       "SELECT DISTINCT strftime('%m', date) as month FROM news WHERE strftime('%Y', date) = ?"
     )
     .all(year)
-    .map((month) => month.month);
+    .map((month: { month: string }) => month.month);
 }
 
-export async function getNewsForYear(year) {
+export async function getNewsForYear(year: string) {
   const news = db
     .prepare(
       "SELECT * FROM news WHERE strftime('%Y', date) = ? ORDER BY date DESC"
@@ -54,10 +56,10 @@ export async function getNewsForYear(year) {
 
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  return news;
+  return news as NewsItem[];
 }
 
-export async function getNewsForYearAndMonth(year, month) {
+export async function getNewsForYearAndMonth(year: string, month: string) {
   const news = db
     .prepare(
       "SELECT * FROM news WHERE strftime('%Y', date) = ? AND strftime('%m', date) = ? ORDER BY date DESC"
@@ -66,5 +68,5 @@ export async function getNewsForYearAndMonth(year, month) {
 
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  return news;
+  return news as NewsItem[];
 }
