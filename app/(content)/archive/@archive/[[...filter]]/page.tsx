@@ -5,11 +5,11 @@ import {
   getNewsForYearAndMonth,
 } from '@/lib/news';
 import NewsList from '@/components/news-list';
-import { NewsItem } from '@/dummy-news';
+import { NewsItem } from '@/lib/types';
 import Link from 'next/link';
 import React from 'react';
 
-export default function YearPage({
+export default async function YearPage({
   params,
 }: {
   params: { filter: string[] | undefined };
@@ -23,14 +23,14 @@ export default function YearPage({
 
   let newsContent = <p>No news are found for the selected year</p>;
 
-  let links = getAvailableNewsYears();
+  let links = await getAvailableNewsYears();
   if (selectedYear && !selectedMonth) {
     links = getAvailableNewsMonths(selectedYear);
-    news = getNewsForYear(selectedYear);
+    news = await getNewsForYear(selectedYear);
   }
 
   if (selectedYear && selectedMonth) {
-    news = getNewsForYearAndMonth(selectedYear, selectedMonth);
+    news = await getNewsForYearAndMonth(selectedYear, selectedMonth);
     // links = getAvailableNewsMonths(selectedYear);
     links = [];
     // console.log(news);

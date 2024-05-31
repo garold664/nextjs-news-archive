@@ -1,4 +1,4 @@
-import { NewsItem } from '@/dummy-news';
+import { NewsItem } from '@/lib/types';
 import Link from 'next/link';
 import React from 'react';
 
