@@ -9,6 +9,45 @@ import { NewsItem } from '@/lib/types';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
+async function FilterHeader({ year, month }: { year: string; month: string }) {
+  const availableYears = await getAvailableNewsYears();
+  if (
+    (year && !availableYears.includes(year)) ||
+    (month && !getAvailableNewsMonths(year).includes(month))
+  ) {
+    throw new Error('Invalid filter');
+  }
+  let links = availableYears;
+
+  if (year && month) {
+    links = [];
+  }
+
+  if (year && !month) {
+    links = getAvailableNewsMonths(year);
+  }
+
+  return (
+    <header id="archive-header">
+      <nav>
+        <ul>
+          {links.map((yearOrMonth) => (
+            <li key={yearOrMonth}>
+              <Link
+                href={`/archive/${year ? year : yearOrMonth}/${
+                  year ? yearOrMonth : ''
+                }`}
+              >
+                {yearOrMonth}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+  );
+}
+
 async function FilteredNews({ year, month }: { year: string; month: string }) {
   let news: NewsItem[];
   if (year && !month) {
@@ -34,45 +73,12 @@ export default async function FilteredNewsPage({
   const selectedYear = filter?.[0];
   const selectedMonth = filter?.[1];
 
-  const availableYears = await getAvailableNewsYears();
-  let links = availableYears;
-
-  if (selectedYear && selectedMonth) {
-    links = [];
-  }
-
-  if (selectedYear && !selectedMonth) {
-    links = getAvailableNewsMonths(selectedYear);
-  }
-
-  if (
-    (selectedYear && !availableYears.includes(selectedYear)) ||
-    (selectedMonth &&
-      !getAvailableNewsMonths(selectedYear).includes(selectedMonth))
-  ) {
-    throw new Error('Invalid filter');
-  }
-
   return (
     <>
-      <header id="archive-header">
-        <nav>
-          <ul>
-            {links.map((yearOrMonth) => (
-              <li key={yearOrMonth}>
-                <Link
-                  href={`/archive/${
-                    selectedYear ? selectedYear : yearOrMonth
-                  }/${selectedYear ? yearOrMonth : ''}`}
-                >
-                  {yearOrMonth}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </header>
-      <Suspense fallback={<p>Loading...</p>}>
+      <Suspense fallback={<p>Loading filter...</p>}>
+        <FilterHeader year={selectedYear} month={selectedMonth} />
+      </Suspense>
+      <Suspense fallback={<p>Loading news...</p>}>
         <FilteredNews year={selectedYear} month={selectedMonth} />
       </Suspense>
     </>
