@@ -7,7 +7,22 @@ import {
 import NewsList from '@/components/news-list';
 import { NewsItem } from '@/lib/types';
 import Link from 'next/link';
-import React from 'react';
+
+async function FilteredNews({ year, month }: { year: string; month: string }) {
+  let news: NewsItem[];
+  if (year && !month) {
+    news = await getNewsForYear(year);
+  } else if (year && month) {
+    news = await getNewsForYearAndMonth(year, month);
+  }
+
+  let newsContent = <p>No news are found for the selected year</p>;
+  if (news && news.length > 0) {
+    newsContent = <NewsList news={news} />;
+  }
+
+  return newsContent;
+}
 
 export default async function FilteredNewsPage({
   params,
@@ -18,29 +33,19 @@ export default async function FilteredNewsPage({
   const selectedYear = filter?.[0];
   const selectedMonth = filter?.[1];
 
-  let news: NewsItem[];
-
-  let newsContent = <p>No news are found for the selected year</p>;
-
-  let links = await getAvailableNewsYears();
-  if (selectedYear && !selectedMonth) {
-    links = getAvailableNewsMonths(selectedYear);
-    news = await getNewsForYear(selectedYear);
-  }
+  const availableYears = await getAvailableNewsYears();
+  let links = availableYears;
 
   if (selectedYear && selectedMonth) {
-    news = await getNewsForYearAndMonth(selectedYear, selectedMonth);
     links = [];
   }
 
-  if (news && news.length > 0) {
-    newsContent = <NewsList news={news} />;
+  if (selectedYear && !selectedMonth) {
+    links = getAvailableNewsMonths(selectedYear);
   }
 
-  const availableNewsYears = await getAvailableNewsYears();
-
   if (
-    (selectedYear && !availableNewsYears.includes(selectedYear)) ||
+    (selectedYear && !availableYears.includes(selectedYear)) ||
     (selectedMonth &&
       !getAvailableNewsMonths(selectedYear).includes(selectedMonth))
   ) {
@@ -66,7 +71,7 @@ export default async function FilteredNewsPage({
           </ul>
         </nav>
       </header>
-      {newsContent}
+      <FilteredNews year={selectedYear} month={selectedMonth} />
     </>
   );
 }
