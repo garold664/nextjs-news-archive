@@ -7,6 +7,7 @@ import {
 import NewsList from '@/components/news-list';
 import { NewsItem } from '@/lib/types';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 async function FilteredNews({ year, month }: { year: string; month: string }) {
   let news: NewsItem[];
@@ -71,7 +72,9 @@ export default async function FilteredNewsPage({
           </ul>
         </nav>
       </header>
-      <FilteredNews year={selectedYear} month={selectedMonth} />
+      <Suspense fallback={<p>Loading...</p>}>
+        <FilteredNews year={selectedYear} month={selectedMonth} />
+      </Suspense>
     </>
   );
 }
